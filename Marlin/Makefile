@@ -55,13 +55,16 @@
 # Or, try disconnecting USB to power down and then reconnecting before running avrdude.
 #
 
+# Debian stretch setup.
+# Install arduino-core (apt install arduino-core) as dependency.
+
 # This defines the board to compile for (see boards.h for your board's ID)
-HARDWARE_MOTHERBOARD ?= 11
+HARDWARE_MOTHERBOARD ?= 74
 
 # Arduino source install directory, and version number
 # On most linuxes this will be /usr/share/arduino
-ARDUINO_INSTALL_DIR  ?= ${HOME}/Arduino
-ARDUINO_VERSION      ?= 106
+ARDUINO_INSTALL_DIR  ?= /usr/share/arduino
+ARDUINO_VERSION      ?= 105
 
 # You can optionally set a path to the avr-gcc tools. Requires a trailing slash. (ex: /usr/local/avr-gcc/bin)
 AVR_TOOLS_PATH ?=
@@ -83,11 +86,11 @@ LIQUID_TWI2        ?= 0
 WIRE               ?= 0
 
 # this defines if U8GLIB is needed (may require RELOC_WORKAROUND)
-U8GLIB             ?= 1
+U8GLIB             ?= 0
 
 # this defines whether to add a workaround for the avr-gcc relocation bug
 #	  https://www.stix.id.au/wiki/AVR_relocation_truncations_workaround
-RELOC_WORKAROUND   ?= 1
+RELOC_WORKAROUND   ?= 0
 
 ############################################################################
 # Below here nothing should be changed...
@@ -243,6 +246,14 @@ else ifeq  ($(HARDWARE_MOTHERBOARD),68)
 HARDWARE_VARIANT ?= arduino
 MCU              ?= atmega2560
 
+# Geeetech GT2560
+else ifeq  ($(HARDWARE_MOTHERBOARD),74)
+HARDWARE_VARIANT ?= arduino
+MCU              ?= atmega1280
+else ifeq  ($(HARDWARE_MOTHERBOARD),75)
+HARDWARE_VARIANT ?= arduino
+MCU              ?= atmega1280
+
 endif
 
 # Be sure to regenerate speed_lookuptable.h with create_speed_lookuptable.py
@@ -263,11 +274,11 @@ TARGET = $(notdir $(CURDIR))
 
 VPATH = .
 VPATH += $(BUILD_DIR)
-VPATH += $(ARDUINO_INSTALL_DIR)/hardware/arduino/avr/cores/arduino
+VPATH += /usr/lib/avr/include
+VPATH += $(ARDUINO_INSTALL_DIR)/hardware/arduino/cores/arduino
 
-VPATH += $(ARDUINO_INSTALL_DIR)/hardware/arduino/avr/libraries/SPI
-VPATH += $(ARDUINO_INSTALL_DIR)/hardware/arduino/avr/libraries/SPI/src
-VPATH += $(ARDUINO_INSTALL_DIR)/libraries/LiquidCrystal/src
+VPATH += $(ARDUINO_INSTALL_DIR)/libraries/SPI
+VPATH += $(ARDUINO_INSTALL_DIR)/libraries/LiquidCrystal
 ifeq ($(LIQUID_TWI2), 1)
 VPATH += $(ARDUINO_INSTALL_DIR)/libraries/Wire
 VPATH += $(ARDUINO_INSTALL_DIR)/libraries/Wire/utility
@@ -287,7 +298,7 @@ endif
 
 ifeq ($(HARDWARE_VARIANT), arduino)
 HARDWARE_SUB_VARIANT ?= mega
-VPATH += $(ARDUINO_INSTALL_DIR)/hardware/arduino/avr/variants/$(HARDWARE_SUB_VARIANT)
+VPATH += $(ARDUINO_INSTALL_DIR)/hardware/arduino/variants/$(HARDWARE_SUB_VARIANT)
 else
 ifeq ($(HARDWARE_VARIANT), Sanguino)
 VPATH += $(HARDWARE_DIR)/marlin/avr/variants/sanguino
@@ -299,7 +310,7 @@ endif
 SRC = wiring.c \
 	wiring_analog.c wiring_digital.c \
 	wiring_pulse.c \
-	wiring_shift.c WInterrupts.c hooks.c
+	wiring_shift.c WInterrupts.c
 ifeq ($(HARDWARE_VARIANT), Teensy)
 SRC = wiring.c
 VPATH += $(ARDUINO_INSTALL_DIR)/hardware/teensy/cores/teensy
@@ -407,7 +418,7 @@ LDFLAGS = -lm
 AVRDUDE_PORT = $(UPLOAD_PORT)
 AVRDUDE_WRITE_FLASH = -Uflash:w:$(BUILD_DIR)/$(TARGET).hex:i
 ifeq ($(shell uname -s), Linux)
-AVRDUDE_CONF = /etc/avrdude/avrdude.conf
+AVRDUDE_CONF = /etc/avrdude.conf
 else
 AVRDUDE_CONF = $(ARDUINO_INSTALL_DIR)/hardware/tools/avr/etc/avrdude.conf
 endif
