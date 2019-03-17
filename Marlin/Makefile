@@ -243,8 +243,10 @@ else ifeq ($(HARDWARE_MOTHERBOARD),310)
 else ifeq ($(HARDWARE_MOTHERBOARD),321)
 # Geeetech GT2560 Rev. A
 else ifeq ($(HARDWARE_MOTHERBOARD),74)
+MCU              ?= atmega1280
 # Geeetech GT2560 Rev. A+ (with auto level probe)
 else ifeq ($(HARDWARE_MOTHERBOARD),75)
+MCU              ?= atmega1280
 
 #
 # ATmega1281, ATmega2561
@@ -389,14 +391,6 @@ MCU              ?= at90usb1286
 else ifeq ($(HARDWARE_MOTHERBOARD),88)
 HARDWARE_VARIANT ?= Teensy
 MCU              ?= at90usb1286
-
-# Geeetech GT2560
-else ifeq  ($(HARDWARE_MOTHERBOARD),74)
-HARDWARE_VARIANT ?= arduino
-MCU              ?= atmega1280
-else ifeq  ($(HARDWARE_MOTHERBOARD),75)
-HARDWARE_VARIANT ?= arduino
-MCU              ?= atmega1280
 
 endif
 
